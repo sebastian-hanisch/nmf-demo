@@ -22,6 +22,7 @@ from nm_presets import (
     init_session_state_defaults,
     load_permalink_settings,
     randomize_seed,
+    seed_widget,
     sync_query_params,
 )
 from nm_visualization import (
@@ -180,11 +181,13 @@ with st.sidebar:
 
     st.markdown("**NMF**")
     if n_electrodes > 1:
+        seed_widget("mode_select")
         mode = st.selectbox(
             "Gleichrichtung", alg.RECTIFY_MODES, key="mode_select", format_func=lambda x: alg.RECTIFY_LABELS[x],
             help="Wie die bipolaren Signale nicht-negativ werden: nur die negative Spitze (Standard) oder der Betrag beider Phasen. Spitzen-F1 fast gleich (0.77 / 0.78), aber die Korrelation mit den wahren Neuronen fällt beim Betrag von 0.79 auf 0.55: "
                  "Spitze und Nachschlag werden zu einer Aktivität verschmolzen.",
         )
+        seed_widget("threshold_slider")
         threshold = st.slider(
             "Rauschschwelle c (Rausch-σ)", *bounds("threshold_slider"), key="threshold_slider", step=0.5,
             help="Vor dem Kappen abgezogen: ohne Schwelle wird das Rauschen mitgleichgerichtet und bildet eine positive Grundlinie. Bei Rauschen 0.05 kaum ein Unterschied (0.76 bei 0, 0.77 bei 2); bei Rauschen 1.0 entscheidet sie: 0.52 (0), 0.63 (1), 0.71 (2), 0.74 (3).",

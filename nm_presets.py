@@ -55,8 +55,22 @@ KEPT = {"mode_select": "_mode_kept", "threshold_slider": "_threshold_kept"}     
 def init_session_state_defaults():
     """Fehlende Zustände auffüllen; die beiden Regler der Gleichrichtung (bei einer Elektrode ausgeblendet, sonst vom Widget-Zustand gelöscht) kehren zum zuletzt gewählten Wert zurück."""
     for state_key, spec in SETTING_SPECS.items():
-        if state_key not in st.session_state:
-            st.session_state[state_key] = st.session_state.get(KEPT[state_key], spec.default) if state_key in KEPT else spec.default
+        if state_key not in KEPT and state_key not in st.session_state:       # ausblendbare Regler: siehe seed_widget
+            st.session_state[state_key] = spec.default
+
+
+def seed_widget(state_key):
+    """Vor dem Zeichnen eines ausblendbaren Reglers: fehlt sein Zustand, kommt der zuletzt gewählte (oder der Standard-) Wert.
+    Ein Wert, der in einem Lauf ohne den Regler in den Zustand des Reglers geschrieben wird, erscheint später als Mindestwert im Regler, während die App mit dem geschriebenen Wert rechnet."""
+    if state_key not in st.session_state:
+        st.session_state[state_key] = st.session_state.get(KEPT[state_key], SETTING_SPECS[state_key].default)
+
+
+def stash_kept_widget_state():
+    """Permalink und Preset legen den Wert eines ausblendbaren Reglers nur in KEPT ab (der Regler holt ihn sich mit `seed_widget`, sobald er gezeichnet wird)."""
+    for state_key, kept in KEPT.items():
+        if state_key in st.session_state:
+            st.session_state[kept] = st.session_state.pop(state_key)
 
 
 def bounds(state_key):
@@ -84,6 +98,7 @@ def load_permalink_settings():
     for key, step in (("rate_slider", 4), ("similarity_slider", 20), ("jitter_slider", 20), ("synchrony_slider", 20), ("threshold_slider", 2), ("sparsity_slider", 2)):
         st.session_state[key] = round(st.session_state.get(key, SETTING_SPECS[key].default) * step) / step
     st.session_state["iterations_slider"] = int(round(st.session_state.get("iterations_slider", C.DEFAULT_ITERATIONS) / 10) * 10)
+    stash_kept_widget_state()
     st.session_state["permalink_loaded"] = True
 
 
@@ -101,6 +116,7 @@ def apply_preset(name):
         st.session_state[state_key] = C.PRESETS[name][key]
     st.session_state["_mode_kept"] = C.PRESETS[name]["mode"]
     st.session_state["_threshold_kept"] = C.PRESETS[name]["threshold"]
+    stash_kept_widget_state()
 
 
 def randomize_seed():
