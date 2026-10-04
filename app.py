@@ -175,7 +175,7 @@ with st.sidebar:
     )
     n_samples = st.slider(
         "Länge der Aufnahme", *bounds("n_samples_slider"), key="n_samples_slider", step=1000,
-        help="Abtastwerte bei 10 kHz. Mehr Länge = mehr Spikes, aber auch längere Rechenzeit (40000 statt 20000 Abtastwerte etwa das Vierfache für die NMF).",
+        help="Abtastwerte bei 10 kHz. Mehr Länge = mehr Spikes, aber auch längere Rechenzeit (40000 statt 20000 Abtastwerte: bei der NMF gemessen das 1,4- bis 7,7-Fache, je nach Datensatz und Rechner - die Iterationszahl hängt von der Konvergenz ab).",
     )
     seed = st.number_input("Zufalls-Seed", *bounds("seed_input"), key="seed_input", step=1)
 
