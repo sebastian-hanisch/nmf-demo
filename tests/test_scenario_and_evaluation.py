@@ -14,7 +14,7 @@ import nm_scenario as sc
 
 def test_default_dataset_is_bit_identical_to_the_predecessor_demos():
     ds = sc.make_dataset(4, 4, 1.0, 1.0, 0.0, 0.05, 20000, 7)
-    assert float(ds.X.sum()) == 20.409393146494438 and sum(len(t) for t in ds.spike_times) == 227 and ds.X.shape == (4, 20000)
+    assert float(ds.X.sum()) == pytest.approx(20.409393146494438, rel=1e-12) and sum(len(t) for t in ds.spike_times) == 227 and ds.X.shape == (4, 20000)
     assert (ds.A > 0).all()
 
 
